@@ -19,11 +19,24 @@ const Logo = function () {
   return <h1>🏞️Far Away🏘️</h1>;
 };
 
+const handleSubmit = function (e) {
+  e.preventDefault();
+};
+
 const Form = function () {
   return (
-    <div className="add-form">
+    <form className="add-form" onSubmit={handleSubmit}>
       <h3>What do you need for your trip😍</h3>
-    </div>
+      <select>
+        {Array.from({ length: 20 }, (_, i) => i + 1).map((num) => (
+          <option value={num} key={num}>
+            {num}
+          </option>
+        ))}
+      </select>
+      <input type="text" placeholder="Item..."></input>
+      <button>ADD</button>
+    </form>
   );
 };
 
@@ -32,7 +45,7 @@ const ParkingList = function () {
     <div className="list">
       <ul>
         {initialItems.map((item) => (
-          <Item item={item} />
+          <Item item={item} key={item.id} />
         ))}
       </ul>
     </div>
