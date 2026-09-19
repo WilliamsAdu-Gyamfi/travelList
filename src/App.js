@@ -1,17 +1,43 @@
 import { useState } from "react";
 
+/*
 const initialItems = [
   { id: 1, description: "Passports", quantity: 2, packed: false },
   { id: 2, description: "Socks", quantity: 12, packed: false },
   { id: 3, description: "Charger", quantity: 2, packed: true },
 ];
+*/
 
 const App = function () {
+  const [items, setItems] = useState([]);
+
+  const handleAddItems = function (newItem) {
+    setItems((currentItems) => [...currentItems, newItem]);
+  };
+
+  const handleDeleteItems = function (id) {
+    setItems((currentItems) =>
+      currentItems.filter((newItem) => newItem.id !== id),
+    );
+  };
+
+  const handleToggle = function (id) {
+    setItems((items) =>
+      items.map((item) =>
+        item.id === id ? { ...item, packed: !item.packed } : item,
+      ),
+    );
+  };
+
   return (
     <div className="app">
       <Logo />
-      <Form />
-      <PackingList />
+      <Form onAddItems={handleAddItems} />
+      <PackingList
+        items={items}
+        onDeleteItem={handleDeleteItems}
+        onToggleItems={handleToggle}
+      />
       <Stats />
     </div>
   );
@@ -40,7 +66,8 @@ const Form = function () {
 };
 */
 
-const Form = function () {
+const Form = function ({ onAddItems }) {
+  // controlled elements
   const [description, setDescription] = useState("");
   const [quantity, setQuantity] = useState(1);
 
@@ -49,6 +76,7 @@ const Form = function () {
 
     if (!description) return; // we do this to avoid displaying empty strings
 
+    // creating new item to be added to the previous one
     const newItem = {
       description,
       quantity,
@@ -58,6 +86,8 @@ const Form = function () {
 
     console.log(newItem);
 
+    onAddItems(newItem);
+
     //this is done to reset the input fields back to normal(1, "")
     setDescription("");
     setQuantity(1);
@@ -65,8 +95,6 @@ const Form = function () {
 
   return (
     <form className="add-form" onSubmit={handleSubmit}>
-      <h3>What do you need for your trip😍</h3>
-
       <select
         value={quantity}
         onChange={(e) => setQuantity(Number(e.target.value))}
@@ -77,6 +105,7 @@ const Form = function () {
           </option>
         ))}
       </select>
+      <h3>What do you need for your trip😍</h3>
 
       <input
         type="text"
@@ -90,26 +119,35 @@ const Form = function () {
   );
 };
 
-const PackingList = function () {
+const PackingList = function ({ items, onDeleteItem, onToggleItems }) {
   return (
     <div className="list">
       <ul>
-        {initialItems.map((item) => (
-          <Item item={item} key={item.id} />
+        {items.map((item) => (
+          <Item
+            item={item}
+            onDeleteItem={onDeleteItem}
+            onToggleItems={onToggleItems}
+            key={item.id}
+          />
         ))}
       </ul>
     </div>
   );
 };
 
-const Item = function ({ item }) {
+const Item = function ({ item, onDeleteItem, onToggleItems }) {
   return (
     <li>
+      <input
+        type="checkbox"
+        value={item.packed}
+        onChange={() => onToggleItems(item.id)}
+      ></input>
       <span style={item.packed ? { textDecoration: "line-through" } : {}}>
-        {item.quantity}
-        {item.description}
+        {item.quantity} {item.description}
       </span>
-      <button>❌</button>
+      <button onClick={() => onDeleteItem(item.id)}>❌</button>
     </li>
   );
 };
